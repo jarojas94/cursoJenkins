@@ -45,7 +45,20 @@ A screen with “Create First admin User prompt” will appear. You will need to
 
 ![alt text](img/SDLC.png)
 
+## Alternativas a Jenkins
 
+* Self Hosted
+  * Drone CI
+  * TeamCity
+* Hosted (As a service)
+  * Amazon AWS CI/CD Tools
+  * Circle CI
+  * Gitlab CI/CD
+  * Travis
+  * CodeShip
+  * Wercker
+  * SemaphoreCI
+  
 
 
 ## Referencias recomendadas ##
