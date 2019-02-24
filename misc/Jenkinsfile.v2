@@ -14,7 +14,6 @@ node {
      }
    }
    stage('test with a DB') {
-       
      def mysqlImage = docker.image('mysql')
      mysqlImage.pull()
      def mysql = mysqlImage.run("-e MYSQL_ALLOW_EMPTY_PASSWORD=yes")  
