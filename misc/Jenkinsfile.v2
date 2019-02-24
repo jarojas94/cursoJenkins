@@ -17,6 +17,7 @@ node {
      def mysqlImage = docker.image('mysql')
      mysqlImage.pull()
      def mysql = mysqlImage.run("-e MYSQL_ALLOW_EMPTY_PASSWORD=yes")  
+     sh "docker logs ${mysql.id}""
      def myTestContainer = docker.image('node:4.6')
      myTestContainer.pull()
      myTestContainer.inside("--link ${mysql.id}:mysql") { // using linking, mysql will be available at host: mysql, port: 3306
