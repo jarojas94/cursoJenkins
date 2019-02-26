@@ -186,6 +186,86 @@ node {
 }
 ```
 
+## Integraciones con Jenkins / Plugins
+
+Identifico 3 formas de disparar un job en jenkins:
+
+* Acción manual simplemente disparando el job mediante consola web
+* Ejecución periodica por consola web similar a un crontab.
+* Verificación de jenkins cada N minutos al repo para identificar si hubo algún cambio.
+* LA MEJOR ES asincrónicamente mediante plugins del CVS que se este usando, esto por ejemplo si es github, hará que cada vez que se haga push al repo github envíe al jenkins una peticion http para que inicie el job.
+
+### Notificaciones Slack
+
+    Ejemplo envió de notificaciones por slack
+
+```groovy
+node {
+
+  // job
+  try {
+    stage('build') {
+      println('so far so good...')
+    }
+    stage('test') {
+      println('A test has failed!')
+      sh 'exit 1'
+    }
+  } catch(e) {
+    // mark build as failed
+    currentBuild.result = "FAILURE";
+
+    // send slack notification
+    slackSend (color: '#00FFFF', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+
+    // throw the error
+    throw e;
+  }
+}
+
+```
+
+## Escanear repositorios automáticamente ##
+
+    Mediante el plugin de CVS indicado, es posible que jenkins escanee los repos de una organización o un usuario, con esto no es necesario agregar reposiotrio por reposiotrio a jenkins sino que automáticamente va a escanear todos los reposiotrios de una organización y va a ejecutar los Jenkinsfile que detecte.
+
+![alt text](img/jenkinsScanRepos2.png)
+![alt text](img/jenkinsScanRepos.png)
+
+## Custom API Integration ##
+
+![alt text](img/jenkinsApi.png)
+
+En ocaciones puede que los plugins de jenkins que hacen llamados a APIs no tengan las suficientes funcionalidades o ni siquiera exista un plugin. Al momento de crear un pipeline, jenkins brinda la sintaxis de los plugins instalados para usarlos con groovy en el jenkinsfile:
+
+![alt text](img/pluginsSyntax.png)
+
+Además, usando groovy, los Jenkinsfile y el plugin llamado `http request plugin` se puede realizar peticiones a un API como a continuación se usa el api de bitbucket para realizar un pull request sobre determinado repo:
+
+```groovy
+// example of custom API
+import groovy.json.JsonSlurperClassic 
+
+@NonCPS
+def jsonParse(def json) {
+    new groovy.json.JsonSlurperClassic().parseText(json)
+}
+
+def repo = "edwardviaene/jenkins-course"
+
+def token = httpRequest authentication: 'bitbucket-oauth', contentType: 'APPLICATION_FORM', httpMode: 'POST', requestBody: 'grant_type=client_credentials', url: 'https://bitbucket.org/site/oauth2/access_token'
+def accessToken = jsonParse(token.content).access_token
+def pr = httpRequest customHeaders: [[maskValue: true, name: 'Authorization', value: 'Bearer ' + accessToken]], url: "https://api.bitbucket.org/2.0/repositories/${repo}/pullrequests"
+
+for (p in jsonParse(pr.content).values) { 
+    println(p.source.branch.name)
+}
+```
+## Ejemplo GRADLE con SONARQUBE
+
+    https://github.com/jarojas94/cursoJenkins/tree/master/sonarqube
+
+
 ## Referencias recomendadas ##
 1. http://codehero.co/author/jonathan.html
 1. http://charlascylon.com/tutorialmongo
