@@ -265,6 +265,36 @@ for (p in jsonParse(pr.content).values) {
 
     https://github.com/jarojas94/cursoJenkins/tree/master/sonarqube
 
+## Jenkins Slaves
+
+* Permite paralelizar la ejecución de jobs/pipelines.
+* Cada nodo nuevo es llamado worker.
+* Al nodo principal se le denomina master.
+* Es posible con nuevas instancias EC2 Autoscaling, docker en una maquina o ECS.
+* En los pipelines mediante el jenkinsfile se puede especifiicar qué nodo va a atender la ejecución o si serán todos.
+* Es posible la comunicación entre nodos por SSH o Java (JNLP).
+
+![alt text](img/slaves.png)
+
+## Blue Ocean New GUI
+
+* Permite una mejor visualización de jenkins en general pero es dedicado a mejorar visualmente los Pipelines.
+* Instalar plugin `Blue Ocean`
+
+![alt text](img/blueocean.png)
+
+## Seguridad y buenas prácticas##
+
+* No instalar en los nodos slaves plugins, en vez de esto usar docker con imágenes predefinidas.
+* No incluir nodo por nodo credenciales y mucho menos quemarlas en los jenkinsfiles, en vez de eso usar las credenciales guardas en jenkins. Para el caso tener que usar llaves ssh, (por ejemplo para interactuar con reposiotrios privados por ssh, para dejar artefactos en servidores repotos por ssh, etc.)  se recomienda emplear el plugin `SSH AGent Plugin` que permite en el jenkins file indicar que ssh-agent add agregue la llave privada que está registrada en el reposiotrio de credenciales de jenkins, con esto cualquier nodo la puede usar y solo quedan almacenadas en el master.
+* Principalmente desplegar los nodos en red privada sin acceso a internet. 
+* Usar VPN para comunicación con nodos.
+* Instalar la última versión.
+* Recomendable usar la última versión estable lts (`long term support`)
+* Mantener los plugins actualizados.
+* Habilitar la autenticación y autorización.
+* `Tener en cuenta que los administradores puedes decifrar las credenciales.`
+
 
 ## Referencias recomendadas ##
 1. http://codehero.co/author/jonathan.html
